@@ -14,7 +14,7 @@ public record ProductResponse(
         String environment,
         String promotionMessage,
         String targetCurrency,
-        double convertedValue
+        double convertedPrice
 ) {
     public static ProductResponse fromEntity(ProductEntity entity, String environment, String promotionMessage, String targetCurrency, double convertedPrice) {
         return new ProductResponse(
