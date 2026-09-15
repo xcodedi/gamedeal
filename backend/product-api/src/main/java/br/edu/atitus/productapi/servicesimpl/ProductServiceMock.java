@@ -4,6 +4,7 @@ import br.edu.atitus.productapi.dtos.ProductRequest;
 import br.edu.atitus.productapi.dtos.ProductResponse;
 import br.edu.atitus.productapi.entities.ProductEntity;
 import br.edu.atitus.productapi.services.ProductService;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -41,11 +42,11 @@ public class ProductServiceMock implements ProductService {
         ProductEntity product = database.stream()
                 .filter(item -> item.getId().equals(id))
                 .findFirst()
-                .orElseThrow(() -> new Exception("Produto não encontrado"));
+                .orElseThrow(() -> new EntityNotFoundException("Produto não encontrado"));
 
         String environment = "Product API running in port " + serverPort;
 
-        return ProductResponse.fromEntity(product, environment, promotionMessage, targetcurrency, product.getPrice());
+        return ProductResponse.fromEntity(product, environment, promotionMessage, targetcurrency, 0);
     }
 
     @Override
@@ -59,7 +60,7 @@ public class ProductServiceMock implements ProductService {
                         environment,
                         promotionMessage,
                         targetCurrency,
-                        product.getPrice()
+                        0
                 ))
                 .toList();
 
