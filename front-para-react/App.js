@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import {
+  Alert,
   Image,
   Pressable,
   SafeAreaView,
@@ -27,7 +28,9 @@ const palette = {
 };
 
 const PRODUCT_API_BASE = process.env.EXPO_PUBLIC_PRODUCT_API_URL || 'http://10.0.2.2:8000';
+const AUTH_API_BASE = process.env.EXPO_PUBLIC_AUTH_API_URL || 'http://10.0.2.2:8080';
 const SALES_API_BASE = process.env.EXPO_PUBLIC_SALES_API_URL || 'http://10.0.2.2:8100';
+const PROFILE_API_BASE = process.env.EXPO_PUBLIC_PROFILE_API_URL || 'http://10.0.2.2:8200';
 const SUPABASE_URL = process.env.EXPO_PUBLIC_SUPABASE_URL || 'https://example.supabase.co';
 const SUPABASE_ANON_KEY = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || 'demo';
 
@@ -51,6 +54,8 @@ const mockSales = [
 const categories = ['Todos os Serviços', 'CS2', 'Valorant', 'WOW', 'Skins', 'Coaching', 'Rank Boost'];
 
 const formatCurrency = (value) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value || 0);
+const isValidEmail = (value = '') => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim());
+const isValidPassword = (value = '') => value.trim().length >= 6;
 
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, { auth: { persistSession: false } });
 
@@ -71,11 +76,194 @@ async function uploadToSupabase(uri, fileName = 'product-image.jpg') {
 
 function App() {
   const [screen, setScreen] = useState('auth');
+  const [screenHistory, setScreenHistory] = useState(['auth']);
   const [products, setProducts] = useState(mockProducts);
   const [sales, setSales] = useState(mockSales);
   const [selectedProduct, setSelectedProduct] = useState(mockProducts[0]);
   const [selectedCategory, setSelectedCategory] = useState('Todos os Serviços');
-  const [cart, setCart] = useState([mockProducts[0]]);
+  const [cart, setCart] = useState([]);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [authMode, setAuthMode] = useState('login');
+  const [authForm, setAuthForm] = useState({ name: '', email: '', password: '', confirmPassword: '' });
+  const [authError, setAuthError] = useState('');
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('pix');
+  const [currentUser, setCurrentUser] = useState(null);
+
+  const navigateTo = (nextScreen) => {
+    setScreen(nextScreen);
+    setScreenHistory((current) => {
+      const last = current[current.length - 1];
+      if (last === nextScreen) return current;
+      return [...current, nextScreen];
+    });
+  };
+
+  const goBack = () => {
+    setScreenHistory((current) => {
+      if (current.length <= 1) {
+        return current;
+      }
+      const next = current.slice(0, -1);
+      setScreen(next[next.length - 1]);
+      return next;
+    });
+  };
+
+  const fetchProfileByEmail = async (email) => {
+    if (!email) return null;
+
+    try {
+      const response = await fetch(`${PROFILE_API_BASE}/profiles/email?email=${encodeURIComponent(email)}`);
+      if (!response.ok) {
+        return null;
+      }
+      return await response.json();
+    } catch (error) {
+      console.log('Profile API unavailable, using fallback profile', error);
+      return null;
+    }
+  };
+
+  const handleSocialLogin = async (provider) => {
+    const email = `${provider.toLowerCase()}@demo.local`;
+    const profile = await fetchProfileByEmail(email);
+    setAuthError('');
+    setCurrentUser({
+      name: profile?.username || `${provider} Usuário`,
+      email: profile?.email || email,
+      avatar: profile?.avatarUrl || 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=600&q=80',
+    });
+    setIsAuthenticated(true);
+    navigateTo('home');
+  };
+
+  const handleLogin = async () => {
+    const email = authForm.email.trim();
+    const password = authForm.password.trim();
+
+    if (!isValidEmail(email)) {
+      setAuthError('Informe um e-mail válido para continuar.');
+      return;
+    }
+
+    if (!isValidPassword(password)) {
+      setAuthError('A senha deve ter pelo menos 6 caracteres.');
+      return;
+    }
+
+    try {
+      const response = await fetch(`${AUTH_API_BASE}/auth/signin`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText || 'Credenciais inválidas.');
+      }
+
+      const payload = await response.json();
+      const user = payload.user || payload;
+      const profile = await fetchProfileByEmail(user.email || email);
+      setCurrentUser({
+        name: profile?.username || user.name || 'Usuário',
+        email: profile?.email || user.email || email,
+        avatar: profile?.avatarUrl || 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=600&q=80',
+      });
+      setAuthError('');
+      setIsAuthenticated(true);
+      navigateTo('home');
+      return;
+    } catch (error) {
+      console.log('Auth API login unavailable, fallback enabled:', error);
+    }
+
+    const fallbackProfile = await fetchProfileByEmail(email);
+    setCurrentUser({
+      name: fallbackProfile?.username || 'Usuário',
+      email: fallbackProfile?.email || email,
+      avatar: fallbackProfile?.avatarUrl || 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=600&q=80',
+    });
+    setAuthError('');
+    setIsAuthenticated(true);
+    navigateTo('home');
+  };
+
+  const handleCreateAccount = async () => {
+    const name = authForm.name.trim();
+    const email = authForm.email.trim();
+    const password = authForm.password.trim();
+    const confirmPassword = authForm.confirmPassword.trim();
+
+    if (!name) {
+      setAuthError('Informe seu nome para criar a conta.');
+      return;
+    }
+
+    if (!isValidEmail(email)) {
+      setAuthError('Informe um e-mail válido para continuar.');
+      return;
+    }
+
+    if (!isValidPassword(password)) {
+      setAuthError('A senha deve ter pelo menos 6 caracteres.');
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setAuthError('As senhas precisam coincidir.');
+      return;
+    }
+
+    try {
+      const response = await fetch(`${AUTH_API_BASE}/auth/signup`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, password }),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText || 'Não foi possível cadastrar a conta.');
+      }
+
+      setAuthMode('login');
+      setAuthForm({ name: '', email: '', password: '', confirmPassword: '' });
+      setAuthError('Conta criada com sucesso. Faça login para continuar.');
+      return;
+    } catch (error) {
+      console.log('Auth API signup unavailable, fallback enabled:', error);
+    }
+
+    setAuthMode('login');
+    setAuthForm({ name: '', email: '', password: '', confirmPassword: '' });
+    setAuthError('Conta criada com sucesso. Faça login para continuar.');
+  };
+
+  const handleFinishCheckout = () => {
+    if (!isAuthenticated) {
+      setAuthError('Você precisa fazer login antes de concluir a compra.');
+      navigateTo('auth');
+      return;
+    }
+
+    if (!cart.length) {
+      Alert.alert('Carrinho vazio', 'Selecione pelo menos um item para finalizar a compra.');
+      return;
+    }
+
+    navigateTo('payment');
+  };
+
+  const handleConfirmPayment = () => {
+    if (!cart.length) {
+      Alert.alert('Carrinho vazio', 'Selecione um item antes de confirmar o pagamento.');
+      return;
+    }
+
+    navigateTo('success');
+  };
 
   useEffect(() => {
     fetchProducts();
@@ -114,48 +302,75 @@ function App() {
     return mockServices.filter((service) => service.category === selectedCategory);
   }, [selectedCategory]);
 
-  const handleLogin = () => setScreen('home');
-
   const handleAddToCart = (product) => {
+    if (!isAuthenticated) {
+      setAuthError('Faça login para adicionar itens ao carrinho.');
+      navigateTo('auth');
+      return;
+    }
+
+    if (!product || !product.id) {
+      Alert.alert('Produto inválido', 'Selecione um produto válido antes de continuar.');
+      return;
+    }
+
     setSelectedProduct(product);
     setCart([product]);
-    setScreen('checkout');
+    navigateTo('checkout');
   };
 
   const handleCreateListing = async (payload) => {
+    const normalized = {
+      ...payload,
+      model: String(payload.model || '').trim(),
+      category: String(payload.category || '').trim(),
+      description: String(payload.description || '').trim(),
+      price: Number(payload.price || 0),
+    };
+
+    if (!normalized.model || !normalized.category || !normalized.description || normalized.price <= 0) {
+      Alert.alert('Dados incompletos', 'Preencha nome do item, categoria, descrição e um preço válido antes de salvar.');
+      return;
+    }
+
     try {
       await fetch(`${PRODUCT_API_BASE}/products`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
+        body: JSON.stringify(normalized),
       });
     } catch (error) {
       console.log('Save product locally skipped', error);
     }
     setProducts((current) => [
-      { id: Date.now(), ...payload, price: Number(payload.price || 0) },
+      { id: Date.now(), ...normalized, price: Number(normalized.price || 0) },
       ...current,
     ]);
-    setScreen('home');
+    navigateTo('home');
   };
 
   const renderScreen = () => {
-    if (screen === 'auth') return <AuthScreen onLogin={handleLogin} />;
-    if (screen === 'home') return <HomeScreen products={products} onOpenProduct={(product) => { setSelectedProduct(product); setScreen('detail'); }} onOpenServices={() => setScreen('services')} />;
-    if (screen === 'services') return <ServicesScreen services={filteredServices} selectedCategory={selectedCategory} onSelectCategory={setSelectedCategory} onOpenProduct={(product) => { setSelectedProduct(product); setScreen('detail'); }} />;
-    if (screen === 'detail') return <DetailScreen product={selectedProduct} onBuy={() => handleAddToCart(selectedProduct)} onBack={() => setScreen('home')} />;
-    if (screen === 'checkout') return <CheckoutScreen cart={cart} onBack={() => setScreen('detail')} onFinish={() => setScreen('success')} />;
-    if (screen === 'success') return <SuccessScreen onGoHome={() => setScreen('home')} />;
-    if (screen === 'profile') return <ProfileScreen profile={{ username: 'Username', avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=600&q=80', reputation: '99.8%', totalDeals: '14,281', memberSince: 'Membro desde 2024' }} history={sales} onBack={() => setScreen('home')} />;
-    if (screen === 'sales') return <SalesScreen sales={sales} onBack={() => setScreen('home')} onCreate={() => setScreen('createListing')} />;
-    if (screen === 'createListing') return <CreateListingScreen onSubmit={handleCreateListing} onBack={() => setScreen('sales')} />;
+    if (!isAuthenticated && screen !== 'auth') {
+      return <AuthScreen mode={authMode} onToggleMode={setAuthMode} onLogin={handleLogin} onRegister={handleCreateAccount} authForm={authForm} setAuthForm={setAuthForm} authError={authError} onSocialLogin={handleSocialLogin} />;
+    }
+
+    if (screen === 'auth') return <AuthScreen mode={authMode} onToggleMode={setAuthMode} onLogin={handleLogin} onRegister={handleCreateAccount} authForm={authForm} setAuthForm={setAuthForm} authError={authError} onSocialLogin={handleSocialLogin} />;
+    if (screen === 'home') return <HomeScreen products={products} onOpenProduct={(product) => { setSelectedProduct(product); navigateTo('detail'); }} onOpenServices={() => navigateTo('services')} />;
+    if (screen === 'services') return <ServicesScreen services={filteredServices} selectedCategory={selectedCategory} onSelectCategory={setSelectedCategory} onOpenProduct={(product) => { setSelectedProduct(product); navigateTo('detail'); }} />;
+    if (screen === 'detail') return <DetailScreen product={selectedProduct} onBuy={() => handleAddToCart(selectedProduct)} onBack={goBack} />;
+    if (screen === 'checkout') return <CheckoutScreen cart={cart} onBack={goBack} onFinish={handleFinishCheckout} />;
+    if (screen === 'payment') return <PaymentScreen cart={cart} selectedMethod={selectedPaymentMethod} onSelectMethod={setSelectedPaymentMethod} onBack={goBack} onConfirm={handleConfirmPayment} />;
+    if (screen === 'success') return <SuccessScreen onGoHome={() => navigateTo('home')} />;
+    if (screen === 'profile') return <ProfileScreen profile={{ username: currentUser?.name || 'Username', avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=600&q=80', reputation: '99.8%', totalDeals: '14,281', memberSince: 'Membro desde 2024' }} history={sales} onBack={goBack} />;
+    if (screen === 'sales') return <SalesScreen sales={sales} onBack={goBack} onCreate={() => navigateTo('createListing')} />;
+    if (screen === 'createListing') return <CreateListingScreen onSubmit={handleCreateListing} onBack={goBack} />;
     return null;
   };
 
   return (
     <SafeAreaView style={styles.appShell}>
       <StatusBar barStyle="light-content" />
-      {screen !== 'auth' ? <BottomNav current={screen} setScreen={setScreen} /> : null}
+      {screen !== 'auth' ? <BottomNav current={screen} setScreen={navigateTo} /> : null}
       {renderScreen()}
     </SafeAreaView>
   );
@@ -182,7 +397,13 @@ function BottomNav({ current, setScreen }) {
   );
 }
 
-function AuthScreen({ onLogin }) {
+function AuthScreen({ mode, onToggleMode, onLogin, onRegister, authForm, setAuthForm, authError, onSocialLogin }) {
+  const updateField = (field, value) => {
+    setAuthForm((current) => ({ ...current, [field]: value }));
+  };
+
+  const isLoginMode = mode === 'login';
+
   return (
     <View style={styles.centeredPage}>
       <View style={styles.authCard}>
@@ -190,20 +411,71 @@ function AuthScreen({ onLogin }) {
         <Text style={styles.brandBig}>GAMEDEAL</Text>
         <Text style={styles.subtitle}>O mercado seguro para seus itens virtuais</Text>
 
+        {!isLoginMode ? (
+          <View style={styles.formGroup}>
+            <Text style={styles.label}>Nome</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Digite seu nome"
+              placeholderTextColor={palette.muted}
+              value={authForm.name}
+              onChangeText={(value) => updateField('name', value)}
+            />
+          </View>
+        ) : null}
+
         <View style={styles.formGroup}>
           <Text style={styles.label}>E-mail</Text>
-          <TextInput style={styles.input} placeholder="Digite seu e-mail" placeholderTextColor={palette.muted} />
+          <TextInput
+            style={styles.input}
+            placeholder="Digite seu e-mail"
+            placeholderTextColor={palette.muted}
+            value={authForm.email}
+            keyboardType="email-address"
+            autoCapitalize="none"
+            onChangeText={(value) => updateField('email', value)}
+          />
         </View>
         <View style={styles.formGroup}>
           <Text style={styles.label}>Senha</Text>
-          <TextInput style={styles.input} placeholder="Digite sua senha" secureTextEntry placeholderTextColor={palette.muted} />
+          <TextInput
+            style={styles.input}
+            placeholder="Digite sua senha"
+            secureTextEntry
+            placeholderTextColor={palette.muted}
+            value={authForm.password}
+            onChangeText={(value) => updateField('password', value)}
+          />
         </View>
 
-        <TouchableOpacity style={styles.primaryButton} onPress={onLogin}><Text style={styles.primaryButtonText}>Entrar</Text></TouchableOpacity>
+        {!isLoginMode ? (
+          <View style={styles.formGroup}>
+            <Text style={styles.label}>Confirmar senha</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Confirme sua senha"
+              secureTextEntry
+              placeholderTextColor={palette.muted}
+              value={authForm.confirmPassword}
+              onChangeText={(value) => updateField('confirmPassword', value)}
+            />
+          </View>
+        ) : null}
+
+        {authError ? <Text style={styles.errorText}>{authError}</Text> : null}
+
+        <TouchableOpacity style={styles.primaryButton} onPress={isLoginMode ? onLogin : onRegister}><Text style={styles.primaryButtonText}>{isLoginMode ? 'Entrar' : 'Criar conta'}</Text></TouchableOpacity>
+
         <View style={styles.orRow}><View style={styles.line} /><Text style={styles.mutedText}>ou</Text><View style={styles.line} /></View>
-        <TouchableOpacity style={styles.secondaryButton}><Text style={styles.secondaryButtonText}>Entrar com Google</Text></TouchableOpacity>
-        <TouchableOpacity style={styles.secondaryButton}><Text style={styles.secondaryButtonText}>Entrar com Apple</Text></TouchableOpacity>
-        <Text style={styles.authFooter}>Não tem conta? <Text style={styles.link}>Cadastre-se</Text></Text>
+        <TouchableOpacity style={styles.secondaryButton} onPress={() => onSocialLogin('Google')}><Text style={styles.secondaryButtonText}>Entrar com Google</Text></TouchableOpacity>
+        <TouchableOpacity style={styles.secondaryButton} onPress={() => onSocialLogin('Apple')}><Text style={styles.secondaryButtonText}>Entrar com Apple</Text></TouchableOpacity>
+
+        <Text style={styles.authFooter}>
+          {isLoginMode ? 'Não tem conta?' : 'Já tem conta?'}
+          <Text style={styles.link} onPress={() => onToggleMode(isLoginMode ? 'register' : 'login')}>
+            {' '}{isLoginMode ? 'Cadastre-se' : 'Fazer login'}
+          </Text>
+        </Text>
       </View>
     </View>
   );
@@ -368,9 +640,52 @@ function CheckoutScreen({ cart, onBack, onFinish }) {
           <View style={styles.divider} />
           <View style={styles.receiptRow}><Text style={styles.totalLabel}>Net Crypto Due</Text><Text style={styles.accentText}>{formatCurrency(net)}</Text></View>
         </View>
-        <View style={styles.noticeRow}><Ionicons name="close-circle-outline" size={18} color={palette.pink} /><Text style={styles.noticeText}>O cofre de garantia retém o pagamento. Os fundos só são liberados ao vendedor após a troca del item ser verificada.</Text></View>
-        <TouchableOpacity style={styles.primaryButton} onPress={onFinish}><Text style={styles.primaryButtonText}>Finalizar Depósito no Cofre</Text></TouchableOpacity>
+        <View style={styles.noticeRow}><Ionicons name="close-circle-outline" size={18} color={palette.pink} /><Text style={styles.noticeText}>O cofre de garantia retém o pagamento. Os fundos só são liberados ao vendedor após a troca do item ser verificada.</Text></View>
+        <TouchableOpacity style={styles.primaryButton} onPress={onFinish}><Text style={styles.primaryButtonText}>Escolher forma de pagamento</Text></TouchableOpacity>
       </View>
+    </ScrollView>
+  );
+}
+
+function PaymentScreen({ cart, selectedMethod, onSelectMethod, onBack, onConfirm }) {
+  const total = cart.reduce((sum, item) => sum + Number(item.price || 0), 0);
+  const paymentOptions = [
+    { key: 'pix', label: 'PIX', description: 'Pagamento instantâneo e sem taxa' },
+    { key: 'card', label: 'Cartão de crédito', description: 'Parcelamento em até 12x' },
+    { key: 'wallet', label: 'Saldo da conta', description: 'Usar saldo disponível' },
+    { key: 'crypto', label: 'Crypto', description: 'Transferência segura em cripto' },
+  ];
+
+  return (
+    <ScrollView style={styles.page} contentContainerStyle={styles.pageContent}>
+      <View style={styles.topBarTitle}>
+        <TouchableOpacity onPress={onBack}><Ionicons name="arrow-back-outline" size={24} color={palette.text} /></TouchableOpacity>
+        <Text style={styles.bigTitle}>Pagamento</Text>
+      </View>
+
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Escolha a forma de pagamento</Text>
+        {paymentOptions.map((option) => (
+          <TouchableOpacity
+            key={option.key}
+            style={[styles.paymentOption, selectedMethod === option.key && styles.paymentOptionSelected]}
+            onPress={() => onSelectMethod(option.key)}
+          >
+            <View>
+              <Text style={styles.paymentOptionTitle}>{option.label}</Text>
+              <Text style={styles.paymentOptionDesc}>{option.description}</Text>
+            </View>
+            <Ionicons name={selectedMethod === option.key ? 'radio-button-on' : 'radio-button-off'} size={20} color={selectedMethod === option.key ? palette.accent : palette.muted} />
+          </TouchableOpacity>
+        ))}
+      </View>
+
+      <View style={styles.receiptBox}>
+        <View style={styles.receiptRow}><Text style={styles.receiptLabel}>Valor total</Text><Text>{formatCurrency(total)}</Text></View>
+        <View style={styles.receiptRow}><Text style={styles.receiptLabel}>Proteção do cofre</Text><Text style={styles.accentText}>Ativa</Text></View>
+      </View>
+
+      <TouchableOpacity style={styles.primaryButton} onPress={onConfirm}><Text style={styles.primaryButtonText}>Confirmar pagamento</Text></TouchableOpacity>
     </ScrollView>
   );
 }
@@ -527,6 +842,7 @@ const styles = StyleSheet.create({
   brandBig: { fontSize: 40, textAlign: 'center', color: palette.text, fontWeight: '900', textTransform: 'uppercase' },
   brand: { fontSize: 24, color: palette.text, fontWeight: '900', textTransform: 'uppercase' },
   subtitle: { color: palette.muted, textAlign: 'center', marginBottom: 24 },
+  errorText: { color: palette.pink, fontSize: 13, marginBottom: 12, textAlign: 'center' },
   displayTitle: { fontSize: 30, color: palette.text, fontWeight: '800', letterSpacing: 0.5 },
   bigTitle: { fontSize: 24, color: palette.text, fontWeight: '700' },
   sectionTitle: { fontSize: 20, color: palette.text, fontWeight: '800', marginBottom: 12 },
@@ -606,6 +922,10 @@ const styles = StyleSheet.create({
   receiptLabel: { color: palette.muted },
   totalLabel: { fontWeight: '800', color: palette.text },
   accentText: { color: palette.accent, fontWeight: '700' },
+  paymentOption: { backgroundColor: palette.surface, borderColor: palette.border, borderWidth: 1, borderRadius: 16, padding: 16, marginBottom: 12, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  paymentOptionSelected: { borderColor: palette.accent },
+  paymentOptionTitle: { color: palette.text, fontWeight: '700', marginBottom: 4 },
+  paymentOptionDesc: { color: palette.muted, fontSize: 12 },
   noticeRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 10, marginTop: 12, marginBottom: 14 },
   noticeText: { color: palette.muted, fontSize: 13, flex: 1 },
   successWrap: { alignItems: 'center', justifyContent: 'center', width: '100%', maxWidth: 420 },
