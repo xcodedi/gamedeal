@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Detalhes do Item · GAMEDEAL</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script src="app.js" defer></script>
+</head>
+<body class="with-nav">
+  <div class="app">
+    <header class="topbar">
+      <a class="icon-btn" href="categoria-anuncio.html" aria-label="Voltar"><svg class="ic"><use href="#i-arrow-left" /></svg></a>
+      <h1>Detalhes do Item</h1>
+    </header>
+
+    <main class="screen">
+      <form class="form" onsubmit="event.preventDefault(); location.href='revisar-anuncio.html';">
+        <div class="field">
+          <label for="name">Nome do Item *</label>
+          <input id="name" class="input" placeholder="Ex: Espada Lendária do Dragão" required />
+        </div>
+
+        <div class="field">
+          <label for="game">Jogo *</label>
+          <div style="position:relative">
+            <select id="game" class="input" required>
+              <option value="">Selecione o jogo</option>
+              <option>CS2</option>
+              <option>Valorant</option>
+              <option>World of Warcraft</option>
+            </select>
+            <svg class="ic" style="position:absolute;right:12px;top:16px;width:14px;height:14px;pointer-events:none"><use href="#i-chevron-down" /></svg>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="description">Descrição *</label>
+          <textarea id="description" class="input" placeholder="Descreva o estado, nível ou detalhes específicos do item..." required></textarea>
+        </div>
+
+        <div class="form-row">
+          <div class="field">
+            <label for="price">Preço (R$) *</label>
+            <input id="price" class="input" inputmode="decimal" placeholder="0,00" required />
+          </div>
+          <div class="field">
+            <label for="qty">Quantidade *</label>
+            <input id="qty" class="input" inputmode="numeric" value="1" required />
+          </div>
+        </div>
+
+        <div class="field">
+          <span class="label">Adicionar Fotos</span>
+          <div class="row" style="gap:12px">
+            <div class="photo-slot">
+              <div class="thumb"><svg class="ic"><use href="#i-plus" /></svg></div>
+              <button type="button" class="remove" aria-label="Remover foto"><svg class="ic"><use href="#i-x" /></svg></button>
+            </div>
+            <div class="photo-slot"><div class="thumb"><svg class="ic"><use href="#i-plus" /></svg></div></div>
+            <div class="photo-slot"><div class="thumb"><svg class="ic"><use href="#i-plus" /></svg></div></div>
+          </div>
+        </div>
+
+        <button class="btn btn-primary" type="submit">Avançar</button>
+      </form>
+    </main>
+
+    <nav class="bottom-nav">
+      <a href="inicio.html"><svg class="ic"><use href="#i-house" /></svg>Início</a>
+      <a href="servicos.html"><svg class="ic"><use href="#i-zap" /></svg>Serviços</a>
+      <a class="active" href="categoria-anuncio.html"><svg class="ic"><use href="#i-bag" /></svg>Vender</a>
+      <a href="perfil.html"><svg class="ic"><use href="#i-user" /></svg>Perfil</a>
+      <a href="finalizacao-venda.html"><svg class="ic"><use href="#i-cart" /></svg>Carrinho</a>
+    </nav>
+  </div>
+</body>
+</html>

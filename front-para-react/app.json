@@ -1,0 +1,23 @@
+{
+  "expo": {
+    "name": "GAMEDEAL",
+    "slug": "gamedeal",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "android": {
+      "package": "com.gamedeal.app"
+    },
+    "ios": {
+      "bundleIdentifier": "com.gamedeal.app"
+    },
+    "plugins": [
+      "expo-asset",
+      "expo-font",
+      "expo-status-bar"
+    ]
+  }
+}

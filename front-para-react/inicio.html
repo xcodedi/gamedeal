@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Início · GAMEDEAL</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script src="app.js" defer></script>
+</head>
+<body class="with-nav">
+  <div class="app">
+    <header class="home-head">
+      <a class="brand" href="inicio.html"><span class="logo-mark">G</span>GAMEDEAL</a>
+      <div class="row" style="gap:8px">
+        <button class="icon-btn" aria-label="Buscar"><svg class="ic"><use href="#i-search" /></svg></button>
+        <button class="icon-btn" aria-label="Notificações"><svg class="ic"><use href="#i-bell" /></svg></button>
+      </div>
+    </header>
+
+    <main class="screen">
+      <section class="card home-hero">
+        <div class="row between">
+          <span class="tag tag-pink">Raro</span>
+          <span class="muted" style="font-size:13px">Oferta do dia</span>
+        </div>
+        <div class="thumb hero-img">Imagem do item</div>
+        <h2 class="display" style="font-size:30px">Crimson Ember Vandal</h2>
+        <div class="row between">
+          <span class="price accent">$49.99</span>
+          <a class="btn btn-primary btn-sm" href="detalhe-item.html">Get Deal</a>
+        </div>
+      </section>
+
+      <section class="stack">
+        <h2 class="h2">Categorias</h2>
+        <div class="chips">
+          <a class="chip" href="servicos.html">Skins</a>
+          <a class="chip" href="servicos.html">CS2</a>
+          <a class="chip" href="servicos.html">VALORANT</a>
+          <a class="chip" href="servicos.html">WOW</a>
+        </div>
+      </section>
+
+      <section class="stack">
+        <div class="row between">
+          <h2 class="h2">Ofertas</h2>
+          <a class="link" href="servicos.html" style="font-size:13px">Ver tudo</a>
+        </div>
+        <div class="grid grid-2 lg-grid-4">
+          <a class="card" href="detalhe-item.html" style="padding:12px">
+            <div class="thumb" style="aspect-ratio:4/3;margin-bottom:12px">Imagem</div>
+            <span class="tag">CS2</span>
+            <p style="font-weight:600;margin:8px 0">Skin Vandal Ember</p>
+            <div class="row" style="gap:8px"><span class="price accent" style="font-size:20px">$49.99</span><span class="old-price">$75.00</span></div>
+          </a>
+          <a class="card" href="detalhe-item.html" style="padding:12px">
+            <div class="thumb" style="aspect-ratio:4/3;margin-bottom:12px">Imagem</div>
+            <span class="tag">Valorant</span>
+            <p style="font-weight:600;margin:8px 0">Faca Dragão Lendário</p>
+            <div class="row" style="gap:8px"><span class="price accent" style="font-size:20px">$79.00</span><span class="old-price">$99.00</span></div>
+          </a>
+        </div>
+      </section>
+    </main>
+
+    <nav class="bottom-nav">
+      <a class="active" href="inicio.html"><svg class="ic"><use href="#i-house" /></svg>Início</a>
+      <a href="servicos.html"><svg class="ic"><use href="#i-zap" /></svg>Serviços</a>
+      <a href="finalizacao-venda.html"><svg class="ic"><use href="#i-cart" /></svg>Carrinho</a>
+      <a href="perfil.html"><svg class="ic"><use href="#i-user" /></svg>Perfil</a>
+    </nav>
+  </div>
+</body>
+</html>

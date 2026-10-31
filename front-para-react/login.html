@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Login · GAMEDEAL</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <div class="app">
+    <main class="auth-wrap auth-page">
+      <div class="stack center" style="gap:16px;margin-top:24px">
+        <div class="vault"><svg class="ic"><use href="#i-lock" /></svg></div>
+        <h1 class="display" style="font-size:44px">GAMEDEAL</h1>
+        <p class="muted">O mercado seguro para seus itens virtuais</p>
+      </div>
+
+      <form class="form" onsubmit="event.preventDefault(); location.href='inicio.html';">
+        <div class="field">
+          <label for="email">E-mail</label>
+          <input id="email" class="input" type="email" placeholder="Digite seu e-mail" autocomplete="email" />
+        </div>
+        <div class="field">
+          <label for="password">Senha</label>
+          <input id="password" class="input" type="password" placeholder="Digite sua senha" autocomplete="current-password" />
+          <a class="muted center" href="#" style="font-size:13px;text-align:right">Esqueceu a senha?</a>
+        </div>
+        <button class="btn btn-primary" type="submit">Entrar</button>
+      </form>
+
+      <div class="row" style="gap:12px">
+        <hr class="divider" style="flex:1" />
+        <span class="muted">ou</span>
+        <hr class="divider" style="flex:1" />
+      </div>
+
+      <div class="stack">
+        <button class="btn btn-social" type="button">Entrar com Google</button>
+        <button class="btn btn-social" type="button">Entrar com Apple</button>
+      </div>
+
+      <p class="auth-footer">Não tem conta? <a class="link" href="criar-conta.html">Cadastre-se</a></p>
+    </main>
+  </div>
+</body>
+</html>

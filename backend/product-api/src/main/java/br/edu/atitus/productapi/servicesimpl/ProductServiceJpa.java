@@ -80,6 +80,13 @@ public class ProductServiceJpa implements ProductService {
     }
 
     @Override
+    public Page<ProductResponse> findByCategory(String category, Pageable pageable, String targetCurrency) throws Exception {
+        var products = repository.findByCategoryIgnoreCase(category, pageable);
+        String environment = "Product API running in port " + serverPort;
+        return products.map(entity -> getResponse(entity, environment, targetCurrency));
+    }
+
+    @Override
     public ProductEntity save(ProductRequest request) throws Exception {
         if (request == null)
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Requisição inválida");
@@ -89,6 +96,8 @@ public class ProductServiceJpa implements ProductService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Modelo inválido");
         if (request.description() == null || request.description().isBlank())
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Descrição inválida");
+        if (request.category() == null || request.category().isBlank())
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Categoria inválida");
         if (request.price() <= 0)
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Preço inválido");
         if (request.currency() == null || request.currency().isBlank())
@@ -98,10 +107,34 @@ public class ProductServiceJpa implements ProductService {
         product.setBrand(request.brand().trim());
         product.setModel(request.model().trim());
         product.setDescription(request.description().trim());
+        product.setCategory(request.category().trim());
         product.setPrice(request.price());
         product.setCurrency(request.currency().trim());
         product.setImage(request.image() != null ? request.image().trim() : null);
 
         return repository.save(product);
+    }
+
+    @Override
+    public ProductEntity update(Long id, ProductRequest request) throws Exception {
+        var product = repository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Produto não encontrado"));
+
+        product.setBrand(request.brand().trim());
+        product.setModel(request.model().trim());
+        product.setDescription(request.description().trim());
+        product.setCategory(request.category().trim());
+        product.setPrice(request.price());
+        product.setCurrency(request.currency().trim());
+        product.setImage(request.image() != null ? request.image().trim() : null);
+        return repository.save(product);
+    }
+
+    @Override
+    public void delete(Long id) throws Exception {
+        if (!repository.existsById(id)) {
+            throw new EntityNotFoundException("Produto não encontrado");
+        }
+        repository.deleteById(id);
     }
 }

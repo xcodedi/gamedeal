@@ -1,0 +1,118 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+0 && (module.exports = {
+    serializeAfterStaticPlugins: null,
+    serializeAndEvaluate: null,
+    serializeSkippingMods: null
+});
+function _export(target, all) {
+    for(var name in all)Object.defineProperty(target, name, {
+        enumerable: true,
+        get: Object.getOwnPropertyDescriptor(all, name).get
+    });
+}
+_export(exports, {
+    get serializeAfterStaticPlugins () {
+        return serializeAfterStaticPlugins;
+    },
+    get serializeAndEvaluate () {
+        return serializeAndEvaluate;
+    },
+    get serializeSkippingMods () {
+        return serializeSkippingMods;
+    }
+});
+const _Errors = require("./Errors");
+function serializeAndEvaluate(val) {
+    if ([
+        'undefined',
+        'string',
+        'boolean',
+        'number',
+        'bigint'
+    ].includes(typeof val)) {
+        return val;
+    } else if (typeof val === 'function') {
+        // TODO: Bacon: Should we support async methods?
+        return val();
+    } else if (Array.isArray(val)) {
+        return val.map(serializeAndEvaluate);
+    } else if (typeof val === 'object') {
+        const output = {};
+        for(const property in val){
+            // NOTE(@kitten): Filter __proto__ in each object serializer to avoid invoking the prototype setter.
+            if (property !== '__proto__' && Object.hasOwn(val, property)) {
+                output[property] = serializeAndEvaluate(val[property]);
+            }
+        }
+        return output;
+    }
+    // symbol
+    throw new _Errors.ConfigError(`Expo config doesn't support \`Symbols\`: ${val}`, 'INVALID_CONFIG');
+}
+function serializeSkippingMods(val) {
+    if (typeof val === 'object' && !Array.isArray(val)) {
+        const output = {};
+        for(const property in val){
+            if (property !== '__proto__' && Object.hasOwn(val, property)) {
+                if (property === 'mods' || property === 'plugins') {
+                    // Don't serialize mods or plugins
+                    output[property] = val[property];
+                } else {
+                    output[property] = serializeAndEvaluate(val[property]);
+                }
+            }
+        }
+        return output;
+    }
+    return serializeAndEvaluate(val);
+}
+function serializeAndEvaluatePlugin(val) {
+    if ([
+        'undefined',
+        'string',
+        'boolean',
+        'number',
+        'bigint'
+    ].includes(typeof val)) {
+        return val;
+    } else if (typeof val === 'function') {
+        return val.name || 'withAnonymous';
+    } else if (Array.isArray(val)) {
+        return val.map(serializeAndEvaluatePlugin);
+    } else if (typeof val === 'object') {
+        const output = {};
+        for(const property in val){
+            if (property !== '__proto__' && Object.hasOwn(val, property)) {
+                output[property] = serializeAndEvaluatePlugin(val[property]);
+            }
+        }
+        return output;
+    }
+    // symbol
+    throw new _Errors.ConfigError(`Expo config doesn't support \`Symbols\`: ${val}`, 'INVALID_CONFIG');
+}
+function serializeAfterStaticPlugins(val) {
+    if (typeof val === 'object' && !Array.isArray(val)) {
+        const output = {};
+        for(const property in val){
+            if (property !== '__proto__' && Object.hasOwn(val, property)) {
+                if (property === 'mods') {
+                    // Don't serialize mods
+                    output[property] = val[property];
+                } else if (property === 'plugins' && Array.isArray(val[property])) {
+                    // Serialize the mods by removing any config plugins
+                    output[property] = val[property].map(serializeAndEvaluatePlugin);
+                } else {
+                    output[property] = serializeAndEvaluate(val[property]);
+                }
+            }
+        }
+        return output;
+    }
+    return serializeAndEvaluate(val);
+}
+
+//# sourceMappingURL=Serialize.js.map

@@ -1,0 +1,176 @@
+services:
+  consul:
+    image: consul:1.15
+    container_name: gamedeal-consul
+    ports:
+      - "8500:8500"
+      - "8600:8600/udp"
+    command: ["agent", "-server", "-bootstrap", "-ui", "-client=0.0.0.0"]
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8500/v1/status/leader >/dev/null || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 15
+      start_period: 10s
+
+  consul-config:
+    image: consul:1.15
+    container_name: gamedeal-consul-config
+    depends_on:
+      consul:
+        condition: service_healthy
+    environment:
+      CONSUL_HTTP_ADDR: http://consul:8500
+    volumes:
+      - ./load-config.sh:/load-config.sh:ro
+    entrypoint: ["/bin/sh", "/load-config.sh"]
+    restart: "no"
+
+  currency-db:
+    image: postgres:16-alpine
+    container_name: gamedeal-currency-db
+    environment:
+      POSTGRES_DB: db_currency
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5433:5432"
+    volumes:
+      - currency_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d db_currency"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  product-db:
+    image: postgres:16-alpine
+    container_name: gamedeal-product-db
+    environment:
+      POSTGRES_DB: db_product
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5434:5432"
+    volumes:
+      - product_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d db_product"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  auth-db:
+    image: postgres:16-alpine
+    container_name: gamedeal-auth-db
+    environment:
+      POSTGRES_DB: db_user
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5435:5432"
+    volumes:
+      - auth_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d db_user"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  currency-api:
+    build:
+      context: ./currency-api
+      dockerfile: Dockerfile
+    container_name: gamedeal-currency-api
+    depends_on:
+      consul:
+        condition: service_healthy
+      consul-config:
+        condition: service_completed_successfully
+      currency-db:
+        condition: service_healthy
+    environment:
+      SPRING_CLOUD_CONSUL_HOST: consul
+      SPRING_CLOUD_CONSUL_PORT: "8500"
+      SPRING_CONFIG_IMPORT: "optional:consul:"
+      SPRING_DATASOURCE_URL: jdbc:postgresql://currency-db:5432/db_currency
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SERVER_PORT: "8100"
+    ports:
+      - "8100:8100"
+
+  product-api:
+    build:
+      context: ./product-api
+      dockerfile: Dockerfile
+    container_name: gamedeal-product-api
+    depends_on:
+      consul:
+        condition: service_healthy
+      consul-config:
+        condition: service_completed_successfully
+      product-db:
+        condition: service_healthy
+    environment:
+      SPRING_CLOUD_CONSUL_HOST: consul
+      SPRING_CLOUD_CONSUL_PORT: "8500"
+      SPRING_CONFIG_IMPORT: "optional:consul:"
+      SPRING_DATASOURCE_URL: jdbc:postgresql://product-db:5432/db_product
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SERVER_PORT: "8000"
+    ports:
+      - "8000:8000"
+
+  auth-api:
+    build:
+      context: ./auth-api
+      dockerfile: Dockerfile
+    container_name: gamedeal-auth-api
+    depends_on:
+      consul:
+        condition: service_healthy
+      consul-config:
+        condition: service_completed_successfully
+      auth-db:
+        condition: service_healthy
+    environment:
+      SPRING_CLOUD_CONSUL_HOST: consul
+      SPRING_CLOUD_CONSUL_PORT: "8500"
+      SPRING_CONFIG_IMPORT: "optional:consul:"
+      SPRING_DATASOURCE_URL: jdbc:postgresql://auth-db:5432/db_user
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SERVER_PORT: "8200"
+    ports:
+      - "8200:8200"
+
+  gateway-api:
+    build:
+      context: ./gateway-api
+      dockerfile: Dockerfile
+    container_name: gamedeal-gateway-api
+    depends_on:
+      consul:
+        condition: service_healthy
+      consul-config:
+        condition: service_completed_successfully
+      currency-api:
+        condition: service_started
+      product-api:
+        condition: service_started
+      auth-api:
+        condition: service_started
+    environment:
+      SPRING_CLOUD_CONSUL_HOST: consul
+      SPRING_CLOUD_CONSUL_PORT: "8500"
+      SPRING_CONFIG_IMPORT: "optional:consul:"
+      SERVER_PORT: "8080"
+    ports:
+      - "8080:8080"
+
+volumes:
+  currency_db_data:
+  product_db_data:
+  auth_db_data:

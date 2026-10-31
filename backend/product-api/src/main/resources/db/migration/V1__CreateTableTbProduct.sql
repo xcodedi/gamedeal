@@ -4,6 +4,7 @@ CREATE TABLE tb_product
     brand       VARCHAR(255),
     model       VARCHAR(255),
     description VARCHAR(255),
+    category    VARCHAR(100),
     currency    VARCHAR(255),
     price       DOUBLE PRECISION NOT NULL,
     image       VARCHAR(255),

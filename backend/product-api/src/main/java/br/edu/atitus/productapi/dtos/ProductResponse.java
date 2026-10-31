@@ -7,10 +7,10 @@ public record ProductResponse(
         String brand,
         String model,
         String description,
+        String category,
         String currency,
         double price,
         String image,
-
         String environment,
         String promotionMessage,
         String targetCurrency,
@@ -19,9 +19,10 @@ public record ProductResponse(
     public static ProductResponse fromEntity(ProductEntity entity, String environment, String promotionMessage, String targetCurrency, double convertedPrice) {
         return new ProductResponse(
                 entity.getId(),
-                entity.getDescription(),
                 entity.getBrand(),
                 entity.getModel(),
+                entity.getDescription(),
+                entity.getCategory(),
                 entity.getCurrency(),
                 entity.getPrice(),
                 entity.getImage(),
@@ -29,6 +30,6 @@ public record ProductResponse(
                 promotionMessage,
                 targetCurrency,
                 convertedPrice
-                );
+        );
     }
 }

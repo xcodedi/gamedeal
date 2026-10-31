@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Revisar Anúncio · GAMEDEAL</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script src="app.js" defer></script>
+</head>
+<body class="with-nav">
+  <div class="app">
+    <header class="topbar">
+      <a class="icon-btn" href="detalhes-anuncio.html" aria-label="Voltar"><svg class="ic"><use href="#i-arrow-left" /></svg></a>
+      <h1>Revisar Anúncio</h1>
+    </header>
+
+    <main class="screen">
+      <section class="card stack" style="padding:12px;gap:16px">
+        <div class="thumb" style="aspect-ratio:16/9">Foto do item</div>
+        <div class="stack" style="gap:4px;padding:0 4px">
+          <h2 class="display" style="font-size:26px">Descrição item</h2>
+          <span class="muted" style="font-size:13px">Jogo • Categoria</span>
+        </div>
+        <p class="muted" style="padding:0 4px">Descrição</p>
+        <span class="price accent" style="padding:0 4px">R$ Valor</span>
+      </section>
+
+      <section class="receipt">
+        <div class="line"><span class="muted">Taxa da plataforma (10%)</span><span>R$ Valor</span></div>
+        <hr class="divider" />
+        <div class="line"><span>Você recebe:</span><span class="accent" style="font-weight:600">R$ Valor</span></div>
+      </section>
+
+      <section class="stack">
+        <a class="btn btn-primary" href="anuncio-publicado.html">Publicar Anúncio</a>
+        <a class="btn btn-ghost" href="detalhes-anuncio.html">Editar Anúncio</a>
+      </section>
+    </main>
+
+    <nav class="bottom-nav">
+      <a href="inicio.html"><svg class="ic"><use href="#i-house" /></svg>Início</a>
+      <a href="servicos.html"><svg class="ic"><use href="#i-zap" /></svg>Serviços</a>
+      <a class="active" href="categoria-anuncio.html"><svg class="ic"><use href="#i-bag" /></svg>Vender</a>
+      <a href="perfil.html"><svg class="ic"><use href="#i-user" /></svg>Perfil</a>
+      <a href="finalizacao-venda.html"><svg class="ic"><use href="#i-cart" /></svg>Carrinho</a>
+    </nav>
+  </div>
+</body>
+</html>

@@ -1,0 +1,26 @@
+{
+  "name": "gamedeal-expo",
+  "version": "1.0.0",
+  "private": true,
+  "main": "node_modules/expo/AppEntry.js",
+  "scripts": {
+    "start": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "web": "expo start --web"
+  },
+  "dependencies": {
+    "@expo/metro-runtime": "~58.0.16",
+    "@expo/vector-icons": "^15.0.2",
+    "@supabase/supabase-js": "^2.49.4",
+    "expo": "~58.0.0",
+    "expo-asset": "~58.0.19",
+    "expo-font": "~58.0.11",
+    "expo-image-picker": "~58.0.10",
+    "expo-status-bar": "~58.0.4",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "react-native": "0.88.1",
+    "react-native-web": "^0.21.4"
+  }
+}

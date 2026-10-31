@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Finalização · GAMEDEAL</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script src="app.js" defer></script>
+</head>
+<body class="with-nav">
+  <div class="app">
+    <header class="topbar">
+      <a class="icon-btn" href="detalhe-item.html" aria-label="Voltar"><svg class="ic"><use href="#i-arrow-left" /></svg></a>
+      <h1>Finalização</h1>
+    </header>
+
+    <main class="screen lg-split">
+      <section class="stack" style="gap:16px">
+        <h2 class="h2">Carrinho</h2>
+        <div class="item-card" data-cart-item>
+          <div class="thumb">Item</div>
+          <div class="stack">
+            <span class="tag" style="align-self:flex-start">Valorant</span>
+            <p style="font-weight:600">Crimson Ember Vandal</p>
+            <span class="muted" style="font-size:13px">Vendedor: Nick</span>
+            <span class="price accent" style="font-size:20px">$1,249.99</span>
+          </div>
+          <button class="icon-btn" aria-label="Remover item" data-remove><svg class="ic"><use href="#i-trash" /></svg></button>
+        </div>
+      </section>
+
+      <section class="stack" style="gap:16px">
+        <h2 class="h2">Resumo</h2>
+        <div class="receipt">
+          <div class="line"><span class="muted">Subtotal</span><span>$1,249.99</span></div>
+          <div class="line"><span class="muted">Vault Escrow Fee (2.5%)</span><span>$31.25</span></div>
+          <div class="line"><span class="muted">Instant Secure Transfer</span><span class="accent">Grátis</span></div>
+          <hr class="divider" />
+          <div class="line total"><span>Net Crypto Due</span><span class="accent">$1,281.24</span></div>
+        </div>
+
+        <div class="row" style="align-items:flex-start;gap:12px">
+          <svg class="ic pink" style="margin-top:2px"><use href="#i-x" /></svg>
+          <p class="muted" style="font-size:13px">O cofre de garantia retém o pagamento. Os fundos só são liberados ao vendedor após a troca do item ser verificada pela nossa API.</p>
+        </div>
+
+        <button class="btn btn-primary" type="button">Finalizar Depósito no Cofre</button>
+      </section>
+    </main>
+
+    <nav class="bottom-nav">
+      <a href="inicio.html"><svg class="ic"><use href="#i-house" /></svg>Início</a>
+      <a href="servicos.html"><svg class="ic"><use href="#i-zap" /></svg>Serviços</a>
+      <a class="active" href="finalizacao-venda.html"><svg class="ic"><use href="#i-cart" /></svg>Carrinho</a>
+      <a href="perfil.html"><svg class="ic"><use href="#i-user" /></svg>Perfil</a>
+    </nav>
+  </div>
+</body>
+</html>

@@ -1,0 +1,150 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "host.exp.exponent",
+    "module": "expo.modules.imagepicker",
+    "version": "58.0.10",
+    "attributes": {
+      "org.gradle.status": "release"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "9.4.1"
+    }
+  },
+  "variants": [
+    {
+      "name": "releaseVariantReleaseApiPublication",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.libraryelements": "aar",
+        "org.gradle.usage": "java-api"
+      },
+      "files": [
+        {
+          "name": "expo.modules.imagepicker-58.0.10.aar",
+          "url": "expo.modules.imagepicker-58.0.10.aar",
+          "size": 173266,
+          "sha512": "1143887197f5eda41ca3816e8a1bb62ed246fbffdf289d025af344f813e8bf38cf9dfc931f9f0574a5b54d4d04e5a3066e0a11250a6cc5eec1dbca066808b73a",
+          "sha256": "41fcecefa3a0495efb2fc6ae4dd5a1160edb7de80203a465591dda5443f486ba",
+          "sha1": "4c5ce4c63ebee66a829963a0396b5dc4d162a148",
+          "md5": "616e2b36b759c865814de6aa7c48b88f"
+        }
+      ]
+    },
+    {
+      "name": "releaseVariantReleaseRuntimePublication",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.libraryelements": "aar",
+        "org.gradle.usage": "java-runtime"
+      },
+      "dependencies": [
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib-jdk7",
+          "version": {
+            "requires": "2.2.10"
+          }
+        },
+        {
+          "group": "org.jetbrains",
+          "module": "annotations",
+          "version": {
+            "requires": "23.0.0"
+          }
+        },
+        {
+          "group": "androidx.activity",
+          "module": "activity-ktx",
+          "version": {
+            "requires": "1.11.0"
+          }
+        },
+        {
+          "group": "androidx.appcompat",
+          "module": "appcompat",
+          "version": {
+            "requires": "1.7.1"
+          }
+        },
+        {
+          "group": "androidx.core",
+          "module": "core-ktx",
+          "version": {
+            "requires": "1.17.0"
+          }
+        },
+        {
+          "group": "androidx.exifinterface",
+          "module": "exifinterface",
+          "version": {
+            "requires": "1.4.1"
+          }
+        },
+        {
+          "group": "com.vanniktech",
+          "module": "android-image-cropper",
+          "version": {
+            "requires": "4.7.0"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlinx",
+          "module": "kotlinx-coroutines-android",
+          "version": {
+            "requires": "1.10.2"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlinx",
+          "module": "kotlinx-coroutines-core",
+          "version": {
+            "requires": "1.10.2"
+          }
+        },
+        {
+          "group": "io.github.expo.pika",
+          "module": "pika-api",
+          "version": {
+            "requires": "1.1.0"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "expo.modules.imagepicker-58.0.10.aar",
+          "url": "expo.modules.imagepicker-58.0.10.aar",
+          "size": 173266,
+          "sha512": "1143887197f5eda41ca3816e8a1bb62ed246fbffdf289d025af344f813e8bf38cf9dfc931f9f0574a5b54d4d04e5a3066e0a11250a6cc5eec1dbca066808b73a",
+          "sha256": "41fcecefa3a0495efb2fc6ae4dd5a1160edb7de80203a465591dda5443f486ba",
+          "sha1": "4c5ce4c63ebee66a829963a0396b5dc4d162a148",
+          "md5": "616e2b36b759c865814de6aa7c48b88f"
+        }
+      ]
+    },
+    {
+      "name": "releaseVariantReleaseSourcePublication",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "sources",
+        "org.gradle.usage": "java-runtime"
+      },
+      "files": [
+        {
+          "name": "expo.modules.imagepicker-58.0.10-sources.jar",
+          "url": "expo.modules.imagepicker-58.0.10-sources.jar",
+          "size": 26993,
+          "sha512": "33581b646258aa6bde65906e2b378202cb5d9ec601889a07edc2f8ce6899c424fd494e304ad97395a4d6055e6372b7358f5b50212ed5eca5d6a52dd03932d992",
+          "sha256": "e700694a65d76221a7802a416d981710a06e6b689568536462d2c71c8db1d4c1",
+          "sha1": "b0b21a820d362c3c0a66f1d7af19cd0bdfe3199c",
+          "md5": "0d593ccccbc8a29b030147078a8bafff"
+        }
+      ]
+    }
+  ]
+}

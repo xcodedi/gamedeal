@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Criar Conta · GAMEDEAL</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <a class="icon-btn" href="login.html" aria-label="Voltar"><svg class="ic"><use href="#i-arrow-left" /></svg></a>
+      <h1>Criar Conta</h1>
+    </header>
+
+    <main class="auth-wrap auth-page" style="margin-top:0">
+      <form class="form" onsubmit="event.preventDefault(); location.href='login.html';">
+        <div class="field">
+          <label for="username">Nome de usuário</label>
+          <input id="username" class="input" placeholder="Nome de usuário" autocomplete="username" />
+        </div>
+        <div class="field">
+          <label for="email">E-mail</label>
+          <input id="email" class="input" type="email" placeholder="Digite seu e-mail" autocomplete="email" />
+        </div>
+        <div class="field">
+          <label for="password">Senha</label>
+          <input id="password" class="input" type="password" placeholder="Crie uma senha" autocomplete="new-password" />
+        </div>
+        <div class="field">
+          <label for="confirm">Confirmar Senha</label>
+          <input id="confirm" class="input" type="password" placeholder="Confirme sua senha" autocomplete="new-password" />
+        </div>
+
+        <div class="row" style="align-items:flex-start;gap:10px">
+          <button type="button" class="checkbox" role="checkbox" aria-checked="false" aria-label="Aceitar termos" data-toggle>
+            <svg class="ic"><use href="#i-check" /></svg>
+          </button>
+          <p class="muted" style="font-size:13px;line-height:18px">
+            Li e aceito os <a class="link" href="#">Termos de Uso</a> e <a class="link" href="#">Política de Privacidade</a>
+          </p>
+        </div>
+
+        <button class="btn btn-primary" type="submit">Criar Conta</button>
+      </form>
+
+      <p class="auth-footer">Já tem conta? <a class="link" href="login.html">Entrar</a></p>
+    </main>
+  </div>
+</body>
+</html>

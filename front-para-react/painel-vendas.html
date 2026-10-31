@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Painel de Vendas · GAMEDEAL</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script src="app.js" defer></script>
+</head>
+<body class="with-nav">
+  <div class="app">
+    <header class="topbar">
+      <h1>Painel de Vendas</h1>
+      <button class="icon-btn" aria-label="Notificações"><svg class="ic"><use href="#i-bell" /></svg></button>
+    </header>
+
+    <main class="screen">
+      <section class="stats">
+        <div class="stat">
+          <span class="stat-label">Anúncios</span>
+          <div class="display">5</div>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Vendas</span>
+          <div class="display">12</div>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Faturamento</span>
+          <div class="display accent">R$ 3.420</div>
+        </div>
+      </section>
+
+      <a class="btn btn-primary" href="categoria-anuncio.html"><svg class="ic"><use href="#i-plus" /></svg>Criar Anúncio</a>
+
+      <section class="stack">
+        <h2 class="h2">Meus Anúncios Ativos</h2>
+        <div class="listing">
+          <div class="thumb">Item</div>
+          <div class="stack">
+            <span style="font-weight:600">Descrição item</span>
+            <span class="accent" style="font-weight:600">R$ Valor</span>
+          </div>
+          <span class="tag">Ativo</span>
+        </div>
+        <div class="listing">
+          <div class="thumb">Item</div>
+          <div class="stack">
+            <span style="font-weight:600">Descrição item</span>
+            <span class="accent" style="font-weight:600">R$ Valor</span>
+          </div>
+          <span class="tag">Ativo</span>
+        </div>
+      </section>
+
+      <section class="stack">
+        <h2 class="h2">Vendas Recentes</h2>
+        <div class="listing">
+          <div class="thumb">Item</div>
+          <div class="stack">
+            <span style="font-weight:600">Descrição item</span>
+            <span class="accent" style="font-weight:600">R$ Valor</span>
+          </div>
+          <span class="tag tag-muted">Vendido</span>
+        </div>
+      </section>
+    </main>
+
+    <nav class="bottom-nav">
+      <a href="inicio.html"><svg class="ic"><use href="#i-house" /></svg>Início</a>
+      <a href="servicos.html"><svg class="ic"><use href="#i-zap" /></svg>Serviços</a>
+      <a class="active" href="painel-vendas.html"><svg class="ic"><use href="#i-bag" /></svg>Vender</a>
+      <a href="perfil.html"><svg class="ic"><use href="#i-user" /></svg>Perfil</a>
+      <a href="finalizacao-venda.html"><svg class="ic"><use href="#i-cart" /></svg>Carrinho</a>
+    </nav>
+  </div>
+</body>
+</html>

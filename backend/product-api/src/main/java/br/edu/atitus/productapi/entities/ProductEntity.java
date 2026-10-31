@@ -12,6 +12,7 @@ public class ProductEntity {
     private String brand;
     private String model;
     private String description;
+    private String category;
     private String currency;
     private double price;
     private String image;
@@ -19,11 +20,12 @@ public class ProductEntity {
     public ProductEntity() {
     }
 
-    public ProductEntity(Long id, String brand, String model, String description, String currency, double price, String image) {
+    public ProductEntity(Long id, String brand, String model, String description, String category, String currency, double price, String image) {
         this.id = id;
         this.brand = brand;
         this.model = model;
         this.description = description;
+        this.category = category;
         this.currency = currency;
         this.price = price;
         this.image = image;
@@ -59,6 +61,14 @@ public class ProductEntity {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
     }
 
     public String getCurrency() {
