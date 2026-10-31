@@ -33,7 +33,7 @@ public class ProductController {
     public ResponseEntity<Page<ProductResponse>> getAll(
             @RequestParam String targetCurrency,
             @PageableDefault(size = 10, sort = "description",page = 0)Pageable pageable
-    ) throws Exception {
+            ) throws Exception {
         var response = service.findAll(pageable, targetCurrency);
         return ResponseEntity.ok(response);
     }
@@ -44,6 +44,6 @@ public class ProductController {
     }
     @ExceptionHandler(Exception.class)
     public ResponseEntity<String> exceptionHandler(Exception ex){
-        return ResponseEntity.status(500).body("Ops!!! Algo deu errado.");
+        return ResponseEntity.status(500).body("Ops!!! Algo deu errado. - " + ex.getMessage());
     }
 }

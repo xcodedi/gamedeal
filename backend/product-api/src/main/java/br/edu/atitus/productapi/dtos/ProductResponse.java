@@ -29,9 +29,6 @@ public record ProductResponse(
                 promotionMessage,
                 targetCurrency,
                 convertedPrice
-        );
+                );
     }
 }
-
-
-
